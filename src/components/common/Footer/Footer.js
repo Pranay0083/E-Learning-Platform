@@ -1,6 +1,5 @@
 import React from 'react';
-import { Mail } from 'lucide-react';
-// Github, Twitter, Linkedin,
+import { Mail, Github, Twitter, Linkedin, } from 'lucide-react';
 import './Footer.css';
 import { Link } from 'react-router-dom';
 
@@ -10,7 +9,7 @@ const Footer = () => {
             <div className="footer-container">
                 <div className="footer-section">
                     <h3>About Us</h3>
-                    <p>We create amazing experiences that help businesses grow and succeed in the digital world.</p>
+                    <p>We create amazing experiences that help students grow and succeed in the real world.</p>
                 </div>
 
                 <div className="footer-section">
@@ -36,9 +35,9 @@ const Footer = () => {
                 <div className="footer-section">
                     <h3>Follow Us</h3>
                     <div className="social-links">
-                        {/* <Link href="#" aria-label="Github"><Github size={20} /></Link>
+                        <Link href="#" aria-label="Github"><Github size={20} /></Link>
                         <Link href="#" aria-label="Twitter"><Twitter size={20} /></Link>
-                        <Link href="#" aria-label="LinkedIn"><Linkedin size={20} /></Link> */}
+                        <Link href="#" aria-label="LinkedIn"><Linkedin size={20} /></Link>
                         <Link href="#" aria-label="Email"><Mail size={20} /></Link>
                     </div>
                 </div>

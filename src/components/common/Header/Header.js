@@ -3,9 +3,11 @@ import { useState } from 'react';
 import { Menu, X, Search, User } from 'lucide-react';
 import './Header.css';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const navigate = useNavigate();
 
     return (
         <header className="main-header">
@@ -18,21 +20,21 @@ const Header = () => {
                     >
                         {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
                     </button>
-                    <h1>THINK-BOX</h1>
+                    <h1 onClick={() => navigate(0)}>THINK-BOX</h1>
                 </div>
 
                 <nav className={`nav-menu ${isMenuOpen ? 'active' : ''}`}>
                     <Link to="/">Home</Link>
                     <Link to="/courses">Courses</Link>
                     <Link to="/instructors">Instructors</Link>
-                    <Link to="/contact">Contact</Link>
+                    <Link to="/enrollments">Enrollments</Link>
                 </nav>
 
                 <div className="header-actions">
-                    <button aria-label="Search">
+                    {/* <button aria-label="Search">
                         <Search size={20} />
-                    </button>
-                    <button aria-label="Account">
+                    </button> */}
+                    <button aria-label="Account" onClick={()=>navigate('/login')}>
                         <User size={20} />
                     </button>
                 </div>
