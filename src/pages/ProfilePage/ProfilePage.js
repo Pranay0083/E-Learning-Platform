@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Camera, Edit2, Mail, Phone, MapPin, User, Book, Award, Settings, LogOut, Trash2 } from 'react-feather';
+import { Camera, Edit2, Mail, LogOut, Trash2, User, Book, Settings } from 'lucide-react';
 import { deleteUser, getCurrentUser, logout, updateUser } from '../../services/api';
-import EditUserModal from './EditModal/Modal'
-import './ProfilePage.css';
+import EditUserModal from './EditModal/Modal';
+import './ProfilePage.css'
 
 const ProfilePage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('profile');
-  const [updatedData, setUpdatedData] = useState({});
+  const [userData, setUserData] = useState({});
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const { id } = useParams();
@@ -20,7 +20,7 @@ const ProfilePage = () => {
       setLoading(true);
       try {
         const response = await getCurrentUser(localStorage.getItem("authToken"));
-        setUpdatedData(response.data);
+        setUserData(response.data);
         setLoading(false);
       } catch (err) {
         setLoading(false);
@@ -31,54 +31,120 @@ const ProfilePage = () => {
     fetchUserData();
   }, [id]);
 
-  const handleSave = async () => {
-    setLoading(true);
+  const handleSave = async (formData) => {
+    if (!formData || typeof formData !== 'object') {
+      throw new Error('Invalid form data provided');
+    }
+  
+    if (!id) {
+      throw new Error('User ID is required');
+    }
+  
+    const authToken = localStorage.getItem('authToken');
+    if (!authToken) {
+      throw new Error('Authentication token is missing');
+    }
+  
     try {
-      const response = await updateUser(id, updatedData, localStorage.getItem("authToken"));
-      setUpdatedData(response.data);
+      setLoading(true);
+      setError(null); // Clear any previous errors
+  
+      // Function to remove empty values from an object
+      const removeEmptyValues = (obj) => {
+        const newObj = {};
+        Object.entries(obj).forEach(([key, value]) => {
+          // Handle arrays
+          if (Array.isArray(value)) {
+            if (value.length > 0) {
+              // Filter out empty strings from arrays
+              const filteredArray = value.filter(item => 
+                item !== null && 
+                item !== undefined && 
+                String(item).trim() !== ''
+              );
+              if (filteredArray.length > 0) {
+                newObj[key] = filteredArray;
+              }
+            }
+          }
+          // Handle nested objects
+          else if (value && typeof value === 'object') {
+            const cleanedNestedObj = removeEmptyValues(value);
+            if (Object.keys(cleanedNestedObj).length > 0) {
+              newObj[key] = cleanedNestedObj;
+            }
+          }
+          // Handle primitive values
+          else if (
+            value !== null && 
+            value !== undefined && 
+            String(value).trim() !== ''
+          ) {
+            newObj[key] = value;
+          }
+        });
+        return newObj;
+      };
+  
+      // Process achievements
+      const processedFormData = {
+        ...formData,
+        achievements: formData.achievements 
+          ? String(formData.achievements)
+              .split(',')
+              .map(achievement => achievement.trim())
+              .filter(achievement => achievement !== '')
+          : []
+      };
+  
+      const cleanedFormData = removeEmptyValues(processedFormData);
+  
+      const response = await updateUser(id, cleanedFormData, authToken);
+  
+      if (!response || !response.data) {
+        throw new Error('Invalid response from server');
+      }
+  
+      setUserData(response.data);
+      setIsEditModalOpen(false);
+  
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || 'An error occurred while saving';
+      setError(errorMessage);
+      console.error('Save Error:', error);
+  
+    } finally {
       setLoading(false);
-    } catch (err) {
-      setLoading(false);
-      setError(err);
-      console.log(err);
     }
   };
-
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleInputChange = (e) => {
-    setUpdatedData({ ...updatedData, [e.target.name]: e.target.value });
-  };
+  
 
   const handleLogout = async () => {
     await logout();
     localStorage.clear();
-    navigate('/')
-  }
+    navigate('/');
+  };
 
   const handleDeleteAccount = async () => {
-     await deleteUser(localStorage.getItem("userID"), localStorage.getItem("authToken"));
-     localStorage.clear();
-      navigate('/');
-      window.location.reload()
-  }
-  
-  const handleCloseModal = () => { 
-    setIsEditModalOpen(false); 
+    await deleteUser(localStorage.getItem("userID"), localStorage.getItem("authToken"));
+    localStorage.clear();
+    navigate('/');
+    window.location.reload();
   };
+
+  if (loading) {
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+  }
 
   return (
     <div className="profile-page">
       <div className="profile-header">
         <div className="profile-cover">
           <div className="profile-avatar">
-            <img src={updatedData.avatar} alt={updatedData.name} />
+            <img
+              src={userData.image || '/api/placeholder/150/150'}
+              alt={userData.name || 'Profile'}
+            />
             <button className="camera-btn">
               <Camera size={20} />
             </button>
@@ -86,24 +152,25 @@ const ProfilePage = () => {
         </div>
         <div className="profile-info">
           <div className="info-header">
-            <h1>{updatedData.name}</h1>
+            <h1>{userData.name}</h1>
+            <span className="text-sm text-gray-500">{userData.role}</span>
             <button
               className="edit-profile-btn"
-              onClick={setIsEditModalOpen}
+              onClick={() => setIsEditModalOpen(true)}
             >
               <Edit2 size={16} />
-               Edit Profile
+              Edit Profile
             </button>
             <button
               className="edit-profile-btn"
               onClick={handleLogout}
             >
               <LogOut size={16} />
-              logout
+              Logout
             </button>
             <button
               className="edit-profile-btn"
-              onClick={openModal}
+              onClick={() => setIsModalOpen(true)}
               style={{ backgroundColor: "red" }}
             >
               <Trash2 size={16} />
@@ -111,18 +178,12 @@ const ProfilePage = () => {
             </button>
           </div>
           <div className="basic-info">
-                <div className="info-item">
-                  <Mail size={16} />
-                  <span>{updatedData.email}</span>
-                </div>
-                <div className="info-item">
-                  <Phone size={16} />
-                  <span>{updatedData.phone}</span>
-                </div>
-                <div className="info-item">
-                  <MapPin size={16} />
-                  <span>{updatedData.location}</span>
-                </div>
+            {userData.email && (
+              <div className="info-item">
+                <Mail size={16} />
+                <span>{userData.email}</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -136,20 +197,15 @@ const ProfilePage = () => {
             <User size={20} />
             Profile
           </button>
-          <button
-            className={`tab-btn ${activeTab === 'learning' ? 'active' : ''}`}
-            onClick={() => setActiveTab('learning')}
-          >
-            <Book size={20} />
-            Learning
-          </button>
-          <button
-            className={`tab-btn ${activeTab === 'achievements' ? 'active' : ''}`}
-            onClick={() => setActiveTab('achievements')}
-          >
-            <Award size={20} />
-            Achievements
-          </button>
+          {userData.role === 'teacher' && (
+            <button
+              className={`tab-btn ${activeTab === 'teaching' ? 'active' : ''}`}
+              onClick={() => setActiveTab('teaching')}
+            >
+              <Book size={20} />
+              Teaching
+            </button>
+          )}
           <button
             className={`tab-btn ${activeTab === 'settings' ? 'active' : ''}`}
             onClick={() => setActiveTab('settings')}
@@ -162,101 +218,89 @@ const ProfilePage = () => {
         <div className="tab-content">
           {activeTab === 'profile' && (
             <div className="profile-section">
-              <div className="section-card">
-                <h2>About Me</h2>
-                  <p>{updatedData.bio}</p>
-              </div>
-
-              <div className="section-card">
-                <h2>Interests</h2>
-                <div className="interests-list">
-                  {updatedData.interests?.map((interest, index) => (
-                    <span key={index} className="interest-tag">
-                      {interest}
-                    </span>
-                  ))}
+              {userData.bio && (
+                <div className="section-card">
+                  <h2>Bio</h2>
+                  <p>{userData.bio}</p>
                 </div>
-              </div>
+              )}
 
-              <div className="section-card">
-                <h2>Social Links</h2>
-                <div className="social-links">
-                  {Object.entries(updatedData.socialLinks || {}).map(([platform, url]) => (
-                    <a
-                      key={platform}
-                      href={url}
-                      className="social-link"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {platform.charAt(0).toUpperCase() + platform.slice(1)}
-                    </a>
-                  ))}
+              {userData.about && (
+                <div className="section-card">
+                  <h2>About</h2>
+                  <p>{userData.about}</p>
                 </div>
-              </div>
+              )}
+
+              {userData.achievements && userData.achievements.length > 0 && (
+                <div className="section-card">
+                  <h2>Achievements</h2>
+                  <ul className="list-disc pl-4">
+                    {userData.achievements.map((achievement, index) => (
+                      <li key={index}>{achievement}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {userData.socialLinks && (
+                <div className="section-card">
+                  <h2>Social Links</h2>
+                  <div className="social-links">
+                    {userData.socialLinks.linkedin && (
+                      <a
+                        href={userData.socialLinks.linkedin}
+                        className="social-link"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        LinkedIn
+                      </a>
+                    )}
+                    {userData.socialLinks.twitter && (
+                      <a
+                        href={userData.socialLinks.twitter}
+                        className="social-link"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Twitter
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
-          {activeTab === 'learning' && (
-            <div className="learning-section">
+          {activeTab === 'teaching' && userData.role === 'teacher' && (
+            <div className="teaching-section">
               <div className="stats-grid">
-                <div className="stat-card">
-                  <div className="stat-value">{updatedData.enrolledCourses}</div>
-                  <div className="stat-label">Enrolled Courses</div>
-                </div>
-                <div className="stat-card">
-                  <div className="stat-value">{updatedData.completedCourses}</div>
-                  <div className="stat-label">Completed Courses</div>
-                </div>
-                <div className="stat-card">
-                  <div className="stat-value">{updatedData.certificates}</div>
-                  <div className="stat-label">Certificates Earned</div>
-                </div>
+                {userData.rating !== undefined && (
+                  <div className="stat-card">
+                    <div className="stat-value">{userData.rating.toFixed(1)}</div>
+                    <div className="stat-label">Rating</div>
+                  </div>
+                )}
+                {userData.students !== undefined && (
+                  <div className="stat-card">
+                    <div className="stat-value">{userData.students}</div>
+                    <div className="stat-label">Students</div>
+                  </div>
+                )}
+                {userData.courses !== undefined && (
+                  <div className="stat-card">
+                    <div className="stat-value">{userData.courses}</div>
+                    <div className="stat-label">Courses</div>
+                  </div>
+                )}
               </div>
-              {/* Add learning progress and history here */}
-            </div>
-          )}
-
-          {activeTab === 'achievements' && (
-            <div className="achievements-section">
-              {/* Add achievements and badges here */}
-            </div>
-          )}
-
-          {activeTab === 'settings' && (
-            <div className="settings-section">
-              <div className="section-card">
-                <h2>Account Settings</h2>
-                <form className="settings-form">
-                  <div className="form-group">
-                    <label>Email Notifications</label>
-                    <div className="toggle-switch">
-                      <input type="checkbox" id="email-notifications" />
-                      <label htmlFor="email-notifications"></label>
-                    </div>
-                  </div>
-                  <div className="form-group">
-                    <label>Two-Factor Authentication</label>
-                    <div className="toggle-switch">
-                      <input type="checkbox" id="two-factor" />
-                      <label htmlFor="two-factor"></label>
-                    </div>
-                  </div>
-                  <div className="form-group">
-                    <label>Profile Visibility</label>
-                    <select
-                      className="settings-select"
-                      name="visibility"
-                      value={updatedData.visibility || 'public'}
-                      onChange={handleInputChange}
-                    >
-                      <option value="public">Public</option>
-                      <option value="private">Private</option>
-                      <option value="connections">Connections Only</option>
-                    </select>
-                  </div>
-                </form>
-              </div>
+              {userData.expertise && (
+                <div className="section-card">
+                  <h2>Expertise</h2>
+                  <p>{userData.expertise}</p>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -266,19 +310,21 @@ const ProfilePage = () => {
         <div className="modal-overlay">
           <div className="modal">
             <h2>Confirm Deletion</h2>
-            <p>Are you sure you want to this Account?</p>
+            <p>Are you sure you want to delete this Account?</p>
             <button onClick={handleDeleteAccount}>Confirm</button>
-            <button onClick={closeModal}>Cancel</button>
+            <button onClick={() => setIsModalOpen(false)}>Cancel</button>
           </div>
         </div>
       )}
-      {isEditModalOpen && ( 
-        <EditUserModal 
-        isOpen={isEditModalOpen} 
-        onClose={handleCloseModal} 
-        user={updatedData} 
-        onSave={handleSave} /> 
-        )}
+
+      {isEditModalOpen && (
+        <EditUserModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          user={userData}
+          onSave={handleSave}
+        />
+      )}
     </div>
   );
 };

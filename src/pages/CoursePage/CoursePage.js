@@ -35,7 +35,6 @@ const CoursesPage = () => {
       setLoading(true);
       try {
         const response = await getCourses();
-        console.log(response.data)
         setCourses(response.data);
         setLoading(false);
       } catch (err) {
