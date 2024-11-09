@@ -1,46 +1,47 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Star, Award, Users, BookOpen, Mail, Linkedin, Twitter } from 'lucide-react';
-import { courses } from '../../data/courses';
 import CourseCard from '../../components/common/CourseCard/CourseCard';
 import './InstructorDetails.css';
-
-const instructors = [
-  {
-    id: '1',
-    name: 'Dr. Sarah Johnson',
-    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
-    expertise: 'Web Development',
-    rating: 4.9,
-    students: 15000,
-    courses: 12,
-    bio: 'Expert in full-stack development with 10+ years of industry experience.',
-    about: `Dr. Sarah Johnson is a renowned web development expert with a Ph.D. in Computer Science from Stanford University. With over a decade of industry experience, she has worked with major tech companies and led numerous successful projects.
-
-Her teaching methodology combines theoretical knowledge with practical, real-world applications, helping students build strong foundations in web development.`,
-    achievements: [
-      'Ph.D. in Computer Science from Stanford University',
-      'Former Senior Developer at Google',
-      'Published author of "Modern Web Development"',
-      'Speaker at major tech conferences'
-    ],
-    socialLinks: {
-      linkedin: 'https://linkedin.com',
-      twitter: 'https://twitter.com',
-      email: 'sarah.johnson@example.com'
-    }
-  }
-];
+import { getCourses, getInstructor } from '../../services/api';
 
 const InstructorDetailPage = () => {
   const { instructorId } = useParams();
-  const instructor = instructors.find(i => i.id === instructorId);
+  console.log(instructorId)
+  const [instructor, setInstructor] = useState();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [courses, setCourses] = useState([]);
+
+  useEffect(() => {
+    const fetchInstructor = async () => {
+      setLoading(true);
+      try {
+        const response = await getInstructor(instructorId);
+        setInstructor(response.data.instructor);
+        setCourses(response.data.courses);
+        setLoading(false);
+      } catch (err) {
+        setLoading(false);
+        setError(err);
+      }
+    };
+    fetchInstructor();
+  }, [instructorId]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error loading instructor: {error.message}</div>;
+  }
 
   if (!instructor) {
     return <div>Instructor not found</div>;
   }
 
-  // Mock instructor's courses
+  // Get instructor's courses
   const instructorCourses = courses.slice(0, 4);
 
   return (
@@ -62,7 +63,7 @@ const InstructorDetailPage = () => {
               <div className="stat">
                 <Users size={20} />
                 <div className="stat-info">
-                  <span className="stat-value">{instructor.students.toLocaleString()}</span>
+                  <span className="stat-value">{instructor.students}</span>
                   <span className="stat-label">Students</span>
                 </div>
               </div>
@@ -75,15 +76,15 @@ const InstructorDetailPage = () => {
               </div>
             </div>
             <div className="social-links">
-              <a href={instructor.socialLinks.linkedin} className="social-btn">
+              <a href={instructor.socialLinks?.linkedin} className="social-btn">
                 <Linkedin size={20} />
                 LinkedIn
               </a>
-              <a href={instructor.socialLinks.twitter} className="social-btn">
+              <a href={instructor.socialLinks?.twitter} className="social-btn">
                 <Twitter size={20} />
                 Twitter
               </a>
-              <a href={`mailto:${instructor.socialLinks.email}`} className="social-btn">
+              <a href={`mailto:${instructor.socialLinks?.email}`} className="social-btn">
                 <Mail size={20} />
                 Contact
               </a>
@@ -101,7 +102,7 @@ const InstructorDetailPage = () => {
         <div className="achievements-section">
           <h2>Achievements</h2>
           <div className="achievements-grid">
-            {instructor.achievements.map((achievement, index) => (
+            {instructor.achievements?.map((achievement, index) => (
               <div key={index} className="achievement-card">
                 <Award size={24} />
                 <p>{achievement}</p>
@@ -114,7 +115,7 @@ const InstructorDetailPage = () => {
           <h2>Courses by {instructor.name}</h2>
           <div className="courses-grid">
             {instructorCourses.map((course) => (
-              <CourseCard key={course.id} course={course} />
+              <CourseCard key={course._id} course={course} />
             ))}
           </div>
         </div>

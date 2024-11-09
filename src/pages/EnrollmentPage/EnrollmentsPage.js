@@ -1,11 +1,41 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Clock, BookOpen, BarChart } from 'lucide-react';
-import { courses } from '../../data/courses';
+import { useNavigate } from 'react-router-dom';
 import './EnrollmentPage.css';
+import { getEnrollments } from '../../services/api';
 
 const EnrollmentPage = () => {
-  // Mock enrolled courses (in real app, this would come from user's data)
-  const enrolledCourses = courses.slice(0, 3);
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [enrolledCourses, setEnrolledCourses] = useState([]);
+
+  useEffect(() => {
+    const fetchEnrollments = async () => {
+      setLoading(true);
+      try {
+        const response = await getEnrollments(localStorage.getItem("authToken"));
+        setEnrolledCourses(response.data);
+        setLoading(false);
+      } catch (err) {
+        setLoading(false);
+        setError(err);
+      }
+    };
+    fetchEnrollments();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error loading enrollments: {error.message}</div>;
+  }
+
+  if (!enrolledCourses || enrolledCourses.length === 0) {
+    return <div>No enrolled courses found</div>;
+  }
 
   return (
     <div className="enrollment-page">
@@ -15,7 +45,7 @@ const EnrollmentPage = () => {
           <div className="stat-card">
             <BookOpen size={24} />
             <div className="stat-info">
-              <span className="stat-value">3</span>
+              <span className="stat-value">{enrolledCourses.length}</span>
               <span className="stat-label">Enrolled Courses</span>
             </div>
           </div>
@@ -53,7 +83,7 @@ const EnrollmentPage = () => {
                   <span className="progress-text">60% Complete</span>
                   <span className="time-left">4h left</span>
                 </div>
-                <button className="continue-button">Continue Learning</button>
+                <button className="continue-button" onClick={() => navigate(`/course/${course.id}`)}>Continue Learning</button>
               </div>
             </div>
           ))}
@@ -62,18 +92,22 @@ const EnrollmentPage = () => {
 
       <div className="learning-path">
         <h2>Recommended Next Steps</h2>
-        <div className="path-timeline">
-          {enrolledCourses[0].modules.slice(0, 3).map((module, index) => (
-            <div key={index} className="timeline-item">
-              <div className="timeline-marker"></div>
-              <div className="timeline-content">
-                <h4>{module.title}</h4>
-                <p>{module.lessons[0].description}</p>
-                <span className="duration">{module.duration}</span>
+        {enrolledCourses[0] && enrolledCourses[0].modules && enrolledCourses[0].modules.length > 0 ? (
+          <div className="path-timeline">
+            {enrolledCourses[0].modules.slice(0, 3).map((module, index) => (
+              <div key={index} className="timeline-item">
+                <div className="timeline-marker"></div>
+                <div className="timeline-content">
+                  <h4>{module.title}</h4>
+                  <p>{module.lessons[0].description}</p>
+                  <span className="duration">{module.duration}</span>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <p>No modules found for the first enrolled course.</p>
+        )}
       </div>
     </div>
   );

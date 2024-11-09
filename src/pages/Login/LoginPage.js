@@ -1,11 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeClosed, Library } from 'lucide-react';
+import { login, register } from '../../services/api';
 
 const LoginPage = () => {
   const [isSad, setIsSad] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoginForm, setIsLoginForm] = useState(true);
+  const [isInstructor, setIsInstructor] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -32,6 +41,10 @@ const LoginPage = () => {
     };
   }, []);
 
+  const handleMail = (mail) => {
+    setEmail(mail);
+  }
+
   const handleFocusPassword = () => {
     document.getElementById('face').style.transform = 'translateX(30px)';
     const eyes = document.getElementsByClassName('eye');
@@ -40,15 +53,45 @@ const LoginPage = () => {
     }
   };
 
-  const handleFocusOutPassword = (event) => {
+  const handleFocusOutPassword = () => {
     document.getElementById('face').style.transform = 'translateX(0)';
-    setIsSad(!event.target.checkValidity());
     const eyes = document.getElementsByClassName('eye');
     for (let eye of eyes) {
       eye.style.transform = `rotate(215deg)`;
     }
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    const userData = {
+      email,
+      password,
+      ...(isLoginForm
+        ? {}
+        : {
+            name,
+            role: isInstructor ? "teacher" : "student"
+          })
+    };
+    try {
+      const response = isLoginForm ? await login(userData) : await register(userData);
+      const { token } = response.data;
+      localStorage.setItem('userID', response.data.userId);
+      localStorage.setItem('isLogin', "true");
+      if (rememberMe) {
+        localStorage.setItem('authToken', token);
+      } else {
+        sessionStorage.setItem('authToken', token);
+      }
+      setLoading(false);
+      navigate('/');
+    } catch (err) {
+      setLoading(false);
+      setError(err);
+      console.log(err)
+    }
+  };
 
   function LoginForm() {
     return (
@@ -59,9 +102,14 @@ const LoginPage = () => {
         <h1 className="form__title">Log in to your Account</h1>
         <p className="form__description">Welcome back! Please, enter your information</p>
 
-        <form>
+        <form onSubmit={(e)=>{handleSubmit(e)}}>
           <label className="form-control__label">Email</label>
-          <input type="email" className="form-control" />
+          <input
+            type="email"
+            className="form-control"
+            onChange={(e) => {handleMail(e.target.value)}}
+            placeholder="Email"
+          />
 
           <label className="form-control__label">Password</label>
           <div className="password-field">
@@ -72,31 +120,31 @@ const LoginPage = () => {
               id="password"
               onFocus={handleFocusPassword}
               onBlur={handleFocusOutPassword}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
             />
             {showPassword ? <EyeClosed onClick={togglePasswordVisibility} /> : <Eye onClick={togglePasswordVisibility} />}
           </div>
           <div className="password__settings">
             <label className="password__settings__remember">
-              <input type="checkbox" />
+              <input type="checkbox" checked={rememberMe} onChange={() => setRememberMe(!rememberMe)} />
               <span className="custom__checkbox">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                 </svg>
               </span>
               Remember me
             </label>
-
-            <Link to="#" >Forgot Password?</Link>
+            <Link to="#">Forgot Password?</Link>
           </div>
-
+          {error && <p className='errowhilesomething'>{error.response.data.message}</p>}
           <button
             type="submit"
             className="form__submit"
             id="submit"
-            onMouseOver={() => setIsSad(!isSad)}
-            onMouseOut={() => setIsSad(!isSad)}
           >
-            Log In
+            {loading ? "Signing in..." : "Sign in"}
           </button>
         </form>
 
@@ -105,8 +153,8 @@ const LoginPage = () => {
           <Link to="#" onClick={() => setIsLoginForm(false)}>Create an account</Link>
         </p>
       </section>
-    )
-  };
+    );
+  }
 
   function SignupForm() {
     return (
@@ -117,12 +165,23 @@ const LoginPage = () => {
         <h1 className="form__title">Create an Account</h1>
         <p className="form__description">Welcome! Please, enter your information to sign up</p>
 
-        <form>
+        <form onSubmit={handleSubmit}>
           <label className="form-control__label">Name</label>
-          <input type="text" className="form-control" />
+          <input
+            type="text"
+            className="form-control"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Name"
+          />
 
           <label className="form-control__label">Email</label>
-          <input type="email" className="form-control" />
+          <input
+            type="email"
+            className="form-control"
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
+          />
 
           <label className="form-control__label">Password</label>
           <div className="password-field">
@@ -130,19 +189,33 @@ const LoginPage = () => {
               type={showPassword ? "text" : "password"}
               className="form-control"
               minLength="4"
-              id="password-signup"
+              id="password"
               onFocus={handleFocusPassword}
               onBlur={handleFocusOutPassword}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
             />
             {showPassword ? <EyeClosed onClick={togglePasswordVisibility} /> : <Eye onClick={togglePasswordVisibility} />}
           </div>
-
+          <div className="password__settings">
+            <label className="password__settings__remember">
+              <input type="checkbox" checked={isInstructor} onClick={() => setIsInstructor(!isInstructor)} />
+              <span className="custom__checkbox">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+              </span>
+              Sign up as Instructor
+            </label>
+            
+            <Link to="#">Forgot Password?</Link>
+          </div>
+          {error && <p>{error.response.data.message}</p>}
           <button
             type="submit"
             className="form__submit"
             id="submit-signup"
-            onMouseOver={() => setIsSad(!isSad)}
-            onMouseOut={() => setIsSad(!isSad)}
           >
             Sign Up
           </button>
@@ -153,12 +226,12 @@ const LoginPage = () => {
           <Link to="#" onClick={() => setIsLoginForm(true)}>Log in to your Account</Link>
         </p>
       </section>
-    )
+    );
   }
 
   return (
     <main>
-      {isLoginForm ? <LoginForm /> : <SignupForm />}
+      {isLoginForm ? LoginForm() : SignupForm()}
 
       <section className={`form__animation ${isSad ? 'sad' : ''}`}>
         <div id="ball">

@@ -1,45 +1,32 @@
 import React from 'react';
+import { useState, useEffect } from 'react';
+import {useNavigate} from 'react-router-dom'
 import { Search, Star, Award, Users } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import './InstructorPage.css';
-
-const instructors = [
-  {
-    id: '1',
-    name: 'Dr. Sarah Johnson',
-    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
-    expertise: 'Web Development',
-    rating: 4.9,
-    students: 15000,
-    courses: 12,
-    bio: 'Expert in full-stack development with 10+ years of industry experience.'
-  },
-  {
-    id: '2',
-    name: 'Prof. Michael Chen',
-    image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80',
-    expertise: 'Data Science',
-    rating: 4.8,
-    students: 12000,
-    courses: 8,
-    bio: 'Leading researcher in AI and machine learning with PhD from MIT.'
-  },
-  {
-    id: '3',
-    name: 'Emma Williams',
-    image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=400&q=80',
-    expertise: 'UX Design',
-    rating: 4.9,
-    students: 10000,
-    courses: 15,
-    bio: 'Former design lead at Google with expertise in user-centered design.'
-  }
-];
+import { getAllInstructors } from '../../services/api';
 
 const InstructorPage = () => {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = React.useState('');
-  const [selectedExpertise, setSelectedExpertise] = React.useState('all');
+  const [instructors, setInstructors] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedExpertise, setSelectedExpertise] = useState('all');
+
+  useEffect(() => {
+    const fetchInstructors = async () => {
+      setLoading(true);
+      try {
+        const response = await getAllInstructors();
+        setInstructors(response.data);
+        setLoading(false);
+      } catch (err) {
+        setLoading(false);
+        setError(err);
+      }
+    };
+    fetchInstructors();
+  }, []);
 
   const filteredInstructors = instructors.filter(instructor =>
     instructor.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
@@ -95,9 +82,9 @@ const InstructorPage = () => {
       <div className="instructors-grid">
         {filteredInstructors.map((instructor) => (
           <div
-            key={instructor.id}
+            key={instructor._id}
             className="instructor-card"
-            onClick={() => navigate(`/instructor/${instructor.id}`)}
+            onClick={() => navigate(`/instructor/${instructor._id}`)}
           >
             <div className="instructor-image">
               <img src={instructor.image} alt={instructor.name} />

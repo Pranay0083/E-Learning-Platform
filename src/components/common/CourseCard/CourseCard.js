@@ -7,7 +7,7 @@ const CourseCard = ({ course }) => {
     const navigate = useNavigate();
     
     return (
-        <div className="course-card" onClick={() => navigate(`/courses/${course.id}`)}>
+        <div className="course-card" onClick={() => navigate(`/courses/${course._id}`)}>
             <div className="course-image">
                 <img src={course.image} alt={course.title} />
                 <span className="course-category">{course.category}</span>

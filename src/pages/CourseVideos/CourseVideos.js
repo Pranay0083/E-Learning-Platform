@@ -1,12 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { ChevronDown, ChevronUp, PlayCircle } from 'lucide-react';
-import { courses } from '../../data/courses';
 import './CourseVideos.css';
+import { getAllCourses } from '../../services/api';
 
 const CourseVideo = () => {
   const { courseId } = useParams();
-  const course = courses.find(c => c.id === courseId);
+  // const [loading, setLoading] = useState(false);
+  // const [error, setError] = useState(null);
+  const [course, setCourse] = useState(null);
+
+  useEffect(() => {
+    const fetchCourseDetails = async () => {
+      // setLoading(true);
+      try {
+        const response = await getAllCourses(courseId);
+        setCourse(response.data);
+        // setLoading(false);
+      } catch (err) {
+        // setLoading(false);
+        // setError(err);
+      }
+    };
+    fetchCourseDetails();
+  }, [courseId]);
+
   const [activeModule, setActiveModule] = useState(0);
   const [activeLesson, setActiveLesson] = useState({ moduleIndex: 0, lessonIndex: 0 });
 

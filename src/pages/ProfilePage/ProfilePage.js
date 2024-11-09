@@ -1,29 +1,76 @@
-import React, { useState } from 'react';
-import { User, Mail, Phone, MapPin, Book, Award, Settings, Camera, Edit2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Camera, Edit2, Mail, Phone, MapPin, User, Book, Award, Settings, LogOut, Trash2 } from 'react-feather';
+import { deleteUser, getCurrentUser, logout, updateUser } from '../../services/api';
+import EditUserModal from './EditModal/Modal'
 import './ProfilePage.css';
 
 const ProfilePage = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('profile');
-  const [isEditing, setIsEditing] = useState(false);
+  const [updatedData, setUpdatedData] = useState({});
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const { id } = useParams();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  // Mock user data (in real app, this would come from auth context/API)
-  const user = {
-    type: 'student', // or 'instructor'
-    name: 'Alex Johnson',
-    email: 'alex.johnson@example.com',
-    phone: '+1 (555) 123-4567',
-    location: 'San Francisco, CA',
-    bio: 'Passionate learner focused on web development and AI. Currently pursuing advanced certifications in full-stack development.',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80',
-    enrolledCourses: 5,
-    completedCourses: 3,
-    certificates: 2,
-    interests: ['Web Development', 'Machine Learning', 'UI/UX Design'],
-    socialLinks: {
-      github: 'https://github.com',
-      linkedin: 'https://linkedin.com',
-      twitter: 'https://twitter.com'
+  useEffect(() => {
+    const fetchUserData = async () => {
+      setLoading(true);
+      try {
+        const response = await getCurrentUser(localStorage.getItem("authToken"));
+        setUpdatedData(response.data);
+        setLoading(false);
+      } catch (err) {
+        setLoading(false);
+        setError(err);
+        console.log(err);
+      }
+    };
+    fetchUserData();
+  }, [id]);
+
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      const response = await updateUser(id, updatedData, localStorage.getItem("authToken"));
+      setUpdatedData(response.data);
+      setLoading(false);
+    } catch (err) {
+      setLoading(false);
+      setError(err);
+      console.log(err);
     }
+  };
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleInputChange = (e) => {
+    setUpdatedData({ ...updatedData, [e.target.name]: e.target.value });
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    localStorage.clear();
+    navigate('/')
+  }
+
+  const handleDeleteAccount = async () => {
+     await deleteUser(localStorage.getItem("userID"), localStorage.getItem("authToken"));
+     localStorage.clear();
+      navigate('/');
+      window.location.reload()
+  }
+  
+  const handleCloseModal = () => { 
+    setIsEditModalOpen(false); 
   };
 
   return (
@@ -31,7 +78,7 @@ const ProfilePage = () => {
       <div className="profile-header">
         <div className="profile-cover">
           <div className="profile-avatar">
-            <img src={user.avatar} alt={user.name} />
+            <img src={updatedData.avatar} alt={updatedData.name} />
             <button className="camera-btn">
               <Camera size={20} />
             </button>
@@ -39,28 +86,43 @@ const ProfilePage = () => {
         </div>
         <div className="profile-info">
           <div className="info-header">
-            <h1>{user.name}</h1>
+            <h1>{updatedData.name}</h1>
             <button
               className="edit-profile-btn"
-              onClick={() => setIsEditing(!isEditing)}
+              onClick={setIsEditModalOpen}
             >
               <Edit2 size={16} />
-              Edit Profile
+               Edit Profile
+            </button>
+            <button
+              className="edit-profile-btn"
+              onClick={handleLogout}
+            >
+              <LogOut size={16} />
+              logout
+            </button>
+            <button
+              className="edit-profile-btn"
+              onClick={openModal}
+              style={{ backgroundColor: "red" }}
+            >
+              <Trash2 size={16} />
+              Delete Account
             </button>
           </div>
           <div className="basic-info">
-            <div className="info-item">
-              <Mail size={16} />
-              <span>{user.email}</span>
-            </div>
-            <div className="info-item">
-              <Phone size={16} />
-              <span>{user.phone}</span>
-            </div>
-            <div className="info-item">
-              <MapPin size={16} />
-              <span>{user.location}</span>
-            </div>
+                <div className="info-item">
+                  <Mail size={16} />
+                  <span>{updatedData.email}</span>
+                </div>
+                <div className="info-item">
+                  <Phone size={16} />
+                  <span>{updatedData.phone}</span>
+                </div>
+                <div className="info-item">
+                  <MapPin size={16} />
+                  <span>{updatedData.location}</span>
+                </div>
           </div>
         </div>
       </div>
@@ -102,21 +164,13 @@ const ProfilePage = () => {
             <div className="profile-section">
               <div className="section-card">
                 <h2>About Me</h2>
-                {isEditing ? (
-                  <textarea
-                    defaultValue={user.bio}
-                    className="edit-bio"
-                    rows={4}
-                  />
-                ) : (
-                  <p>{user.bio}</p>
-                )}
+                  <p>{updatedData.bio}</p>
               </div>
 
               <div className="section-card">
                 <h2>Interests</h2>
                 <div className="interests-list">
-                  {user.interests.map((interest, index) => (
+                  {updatedData.interests?.map((interest, index) => (
                     <span key={index} className="interest-tag">
                       {interest}
                     </span>
@@ -127,7 +181,7 @@ const ProfilePage = () => {
               <div className="section-card">
                 <h2>Social Links</h2>
                 <div className="social-links">
-                  {Object.entries(user.socialLinks).map(([platform, url]) => (
+                  {Object.entries(updatedData.socialLinks || {}).map(([platform, url]) => (
                     <a
                       key={platform}
                       href={url}
@@ -147,15 +201,15 @@ const ProfilePage = () => {
             <div className="learning-section">
               <div className="stats-grid">
                 <div className="stat-card">
-                  <div className="stat-value">{user.enrolledCourses}</div>
+                  <div className="stat-value">{updatedData.enrolledCourses}</div>
                   <div className="stat-label">Enrolled Courses</div>
                 </div>
                 <div className="stat-card">
-                  <div className="stat-value">{user.completedCourses}</div>
+                  <div className="stat-value">{updatedData.completedCourses}</div>
                   <div className="stat-label">Completed Courses</div>
                 </div>
                 <div className="stat-card">
-                  <div className="stat-value">{user.certificates}</div>
+                  <div className="stat-value">{updatedData.certificates}</div>
                   <div className="stat-label">Certificates Earned</div>
                 </div>
               </div>
@@ -190,7 +244,12 @@ const ProfilePage = () => {
                   </div>
                   <div className="form-group">
                     <label>Profile Visibility</label>
-                    <select className="settings-select">
+                    <select
+                      className="settings-select"
+                      name="visibility"
+                      value={updatedData.visibility || 'public'}
+                      onChange={handleInputChange}
+                    >
                       <option value="public">Public</option>
                       <option value="private">Private</option>
                       <option value="connections">Connections Only</option>
@@ -202,6 +261,24 @@ const ProfilePage = () => {
           )}
         </div>
       </div>
+
+      {isModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h2>Confirm Deletion</h2>
+            <p>Are you sure you want to this Account?</p>
+            <button onClick={handleDeleteAccount}>Confirm</button>
+            <button onClick={closeModal}>Cancel</button>
+          </div>
+        </div>
+      )}
+      {isEditModalOpen && ( 
+        <EditUserModal 
+        isOpen={isEditModalOpen} 
+        onClose={handleCloseModal} 
+        user={updatedData} 
+        onSave={handleSave} /> 
+        )}
     </div>
   );
 };

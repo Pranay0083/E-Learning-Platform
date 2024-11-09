@@ -80,7 +80,7 @@ section {
 
 form {
   width: 100%;
-  max-width: 420px;
+  /* max-width: 420px; */
 }
 
 .form-control__label {
@@ -480,4 +480,9 @@ a {
   #face {
     transform: none !important;
   }
+}
+
+.errowhilesomething{
+  color: red;
+  font-size: small;
 }

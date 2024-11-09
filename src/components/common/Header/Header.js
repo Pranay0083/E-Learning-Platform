@@ -1,12 +1,15 @@
 import React from 'react';
 import { useState } from 'react';
-import { Menu, X, Search, User } from 'lucide-react';
+import { Menu, X, User } from 'lucide-react';
 import './Header.css';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isLogin, setIsLogin] = useState(localStorage.getItem('isLogin')
+        ? localStorage.getItem('isLogin')
+        : localStorage.getItem('isLogin') === 'true');
     const navigate = useNavigate();
 
     return (
@@ -34,12 +37,15 @@ const Header = () => {
                     {/* <button aria-label="Search">
                         <Search size={20} />
                     </button> */}
-                    <button aria-label="Account" onClick={()=>navigate('/login')}>
-                        <User size={20} />
-                    </button>
-                </div>
+                    <button aria-label="Account" 
+                    onClick={() => isLogin ? navigate(`/profile/${localStorage.getItem('userID')}`) : navigate('/login')}>
+
+                    {/* onClick={()=>{navigate('/login')}} */}
+                    <User size={20} />
+                </button>
             </div>
-        </header>
+        </div>
+        </header >
     );
 };
 
