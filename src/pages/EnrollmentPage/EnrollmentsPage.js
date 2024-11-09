@@ -52,14 +52,14 @@ const EnrollmentPage = () => {
           <div className="stat-card">
             <Clock size={24} />
             <div className="stat-info">
-              <span className="stat-value">24h</span>
+              <span className="stat-value">0 hours</span>
               <span className="stat-label">Learning Time</span>
             </div>
           </div>
           <div className="stat-card">
             <BarChart size={24} />
             <div className="stat-info">
-              <span className="stat-value">67%</span>
+              <span className="stat-value">Just Started</span>
               <span className="stat-label">Average Progress</span>
             </div>
           </div>
@@ -74,16 +74,16 @@ const EnrollmentPage = () => {
               <div className="course-image">
                 <img src={course.image} alt={course.title} />
                 <div className="progress-bar">
-                  <div className="progress" style={{ width: '60%' }}></div>
+                  <div className="progress" style={{ width: '0' }}></div>
                 </div>
               </div>
               <div className="course-content">
                 <h3>{course.title}</h3>
                 <div className="course-progress">
-                  <span className="progress-text">60% Complete</span>
+                  <span className="progress-text">0% Complete</span>
                   <span className="time-left">4h left</span>
                 </div>
-                <button className="continue-button" onClick={() => navigate(`/course/${course.id}`)}>Continue Learning</button>
+                <button className="continue-button" onClick={() => navigate(`/courses/${course._id}`)}>Continue Learning</button>
               </div>
             </div>
           ))}

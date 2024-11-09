@@ -85,7 +85,10 @@ const LoginPage = () => {
         sessionStorage.setItem('authToken', token);
       }
       setLoading(false);
-      navigate('/');
+      if (isLoginForm){
+        navigate('/')
+      }
+      setIsLoginForm(true)
     } catch (err) {
       setLoading(false);
       setError(err);

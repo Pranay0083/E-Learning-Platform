@@ -100,22 +100,22 @@ const CoursesPage = () => {
             All
           </button>
           <button
-            className={`category-btn ${selectedCategory === 'development' ? 'active' : ''}`}
-            onClick={() => setSelectedCategory('development')}
+            className={`category-btn ${selectedCategory === 'Web Development' ? 'active' : ''}`}
+            onClick={() => setSelectedCategory('Web Development')}
           >
-            Development
+            Web Development
           </button>
           <button
-            className={`category-btn ${selectedCategory === 'design' ? 'active' : ''}`}
-            onClick={() => setSelectedCategory('design')}
+            className={`category-btn ${selectedCategory === 'Machine Learning' ? 'active' : ''}`}
+            onClick={() => setSelectedCategory('Machine Learning')}
           >
-            Design
+            Machine Learning
           </button>
           <button
-            className={`category-btn ${selectedCategory === 'business' ? 'active' : ''}`}
-            onClick={() => setSelectedCategory('business')}
+            className={`category-btn ${selectedCategory === 'Data Science' ? 'active' : ''}`}
+            onClick={() => setSelectedCategory('Data Science')}
           >
-            Business
+            Data Science
           </button>
         </div>
       </div>
