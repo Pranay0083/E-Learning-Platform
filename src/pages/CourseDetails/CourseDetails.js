@@ -163,7 +163,7 @@ const CourseDetails = () => {
     }
     closeDeleteModal();
   };
-  
+
 
   return (
     <div className="course-detail-page">
@@ -194,8 +194,10 @@ const CourseDetails = () => {
           </button>
           {isEnrolled && (
             <button
+              className="enroll-button"
               onClick={handleRemoveEnrollment}
               disabled={loading}
+              style={{ backgroundColor: "red" }}
             >
               Remove Enrollment
             </button>
@@ -203,12 +205,20 @@ const CourseDetails = () => {
           {canUpdateCourse && (
             <>
               <button
+                className="enroll-button"
                 onClick={() => navigate(`/updatecourse/${courseId}`)}
                 disabled={loading}
+                style={{ backgroundColor: "green" }}
               >
                 Update Course
               </button>
-              <button onClick={openDeleteModal}>Delete Course</button>
+              <button 
+              className="enroll-button"
+              onClick={openDeleteModal}
+              style={{ backgroundColor: "red" }}
+              >
+                Delete Course
+                </button>
             </>
 
           )}

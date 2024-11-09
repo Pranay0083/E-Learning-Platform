@@ -101,3 +101,18 @@
     font-size: 0.875rem;
   }
 }
+
+.createCourseButton {
+  padding: 0.5rem 1rem;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.createCourseButton:hover {
+  background: #1d4ed8;
+}
