@@ -4,38 +4,7 @@
   padding: 0 2rem;
 }
 
-/* Hero Section */
-.hero-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
-  padding: 6rem 0;
-  align-items: center;
-}
-
-.hero-content h1 {
-  font-size: 3.5rem;
-  font-weight: 800;
-  line-height: 1.2;
-  margin-bottom: 1.5rem;
-  background: linear-gradient(135deg, #2563eb, #7c3aed);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.hero-content p {
-  font-size: 1.25rem;
-  color: #4b5563;
-  margin-bottom: 2rem;
-  line-height: 1.6;
-}
-
-.hero-buttons {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 3rem;
-}
-
+/* Common styles - create a new file src/styles/common.css */
 .primary-button {
   display: flex;
   align-items: center;
@@ -72,151 +41,7 @@
   background: #f0f7ff;
 }
 
-.stats {
-  display: flex;
-  gap: 3rem;
-}
-
-.stat-item {
-  display: flex;
-  flex-direction: column;
-}
-
-.stat-number {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1a1a1a;
-}
-
-.stat-label {
-  color: #6b7280;
-  font-size: 0.875rem;
-}
-
-.hero-image img {
-  width: 100%;
-  height: auto;
-  border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-}
-
-/* Features Section */
-.features-section {
-  padding: 6rem 0;
-  text-align: center;
-}
-
-.features-section h2 {
-  font-size: 2.5rem;
-  margin-bottom: 3rem;
-  color: #1a1a1a;
-}
-
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
-}
-
-.feature-card {
-  padding: 2rem;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s ease;
-}
-
-.feature-card:hover {
-  transform: translateY(-5px);
-}
-
-.feature-card svg {
-  color: #2563eb;
-  margin-bottom: 1rem;
-}
-
-.feature-card h3 {
-  margin-bottom: 1rem;
-  color: #1a1a1a;
-}
-
-.feature-card p {
-  color: #6b7280;
-  line-height: 1.6;
-}
-
-/* Popular Courses */
-.popular-courses {
-  padding: 6rem 0;
-}
-
-.popular-courses h2 {
-  font-size: 2.5rem;
-  margin-bottom: 3rem;
-  text-align: center;
-  color: #1a1a1a;
-}
-
-.courses-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-}
-
-.course-card {
-  background: white;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s ease;
-}
-
-.course-card:hover {
-  transform: translateY(-5px);
-}
-
-.course-card img {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-}
-
-.course-content {
-  padding: 1.5rem;
-}
-
-.course-tag {
-  background: #f0f7ff;
-  color: #2563eb;
-  padding: 0.25rem 0.75rem;
-  border-radius: 999px;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.course-content h3 {
-  margin: 1rem 0;
-  color: #1a1a1a;
-  font-size: 1.25rem;
-}
-
-.course-content p {
-  color: #6b7280;
-  margin-bottom: 1rem;
-  line-height: 1.6;
-}
-
-.course-meta {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #6b7280;
-  font-size: 0.875rem;
-  margin-bottom: 1rem;
-}
-
 .enroll-button {
-  margin: 2px;
   width: 100%;
   padding: 0.75rem;
   background: #2563eb;
@@ -232,33 +57,7 @@
   background: #1d4ed8;
 }
 
-/* CTA Section */
-.cta-section {
-  padding: 6rem 0;
-  text-align: center;
-  background: linear-gradient(135deg, #f0f7ff 0%, #f5f3ff 100%);
-  border-radius: 20px;
-  margin: 4rem 0;
-}
-
-.cta-content {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.cta-content h2 {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-  color: #1a1a1a;
-}
-
-.cta-content p {
-  color: #6b7280;
-  margin-bottom: 2rem;
-  font-size: 1.125rem;
-}
-
-/* Responsive Design */
+/* Media Queries */
 @media (max-width: 1024px) {
   .hero-section {
     grid-template-columns: 1fr;
