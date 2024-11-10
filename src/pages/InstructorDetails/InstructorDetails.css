@@ -28,6 +28,7 @@
 
 .profile-content {
   flex: 1;
+  padding: 1rem;
 }
 
 .profile-content h1 {
@@ -38,7 +39,7 @@
 
 .expertise {
   display: inline-block;
-  padding: 0.5rem 1rem;
+  /* padding: 0.5rem 1rem; */
   background: white;
   color: #2563eb;
   border-radius: 999px;
@@ -103,7 +104,7 @@
 
 .instructor-content {
   display: grid;
-  gap: 4rem;
+  gap: 3px;
 }
 
 .about-section h2,
