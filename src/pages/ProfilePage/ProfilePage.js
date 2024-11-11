@@ -124,6 +124,7 @@ const ProfilePage = () => {
   const handleLogout = async () => {
     await logout();
     localStorage.clear();
+    sessionStorage.clear();
     navigate('/');
   };
 
@@ -144,7 +145,7 @@ const ProfilePage = () => {
         <div className="profile-cover">
           <div className="profile-avatar">
             <img
-              src={userData.image || '/api/placeholder/150/150'}
+              src={userData.image || 'https://cdn.vectorstock.com/i/1000v/92/16/default-profile-picture-avatar-user-icon-vector-46389216.jpg'}
               alt={userData.name || 'Profile'}
             />
             {/* <button className="camera-btn">
@@ -154,8 +155,8 @@ const ProfilePage = () => {
         </div>
         <div className="profile-info">
           <div className="info-header">
-            <h1>{userData.name}</h1>
-            <span className="text-sm text-gray-500">{userData.role}</span>
+            <h1>{String(userData.name).charAt(0).toUpperCase() + String(userData.name).slice(1)}</h1>
+            <span className="text-sm text-gray-500">{String(userData.role).charAt(0).toUpperCase() + String(userData.role).slice(1)}</span>
             <button
               className="edit-profile-btn"
               onClick={() => setIsEditModalOpen(true)}
@@ -208,13 +209,13 @@ const ProfilePage = () => {
               Teaching
             </button>
           )}
-          <button
+          {/* <button
             className={`tab-btn ${activeTab === 'settings' ? 'active' : ''}`}
             onClick={() => setActiveTab('settings')}
           >
             <Settings size={20} />
             Settings
-          </button>
+          </button> */}
         </div>
 
         <div className="tab-content">

@@ -1,8 +1,10 @@
 import React from "react";
 import { ArrowRight, Play } from "lucide-react";
 import "./Hero.css";
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
+  const navigate = useNavigate();
   return (
     <section className="hero-section">
       <div className="hero-content">
@@ -12,10 +14,18 @@ const Hero = () => {
           instructors, and a supportive community.
         </p>
         <div className="hero-buttons">
-          <button className="primary-button">
+          <button className="primary-button" onClick={() => navigate("/login")}>
             Get Started <ArrowRight size={20} />
           </button>
-          <button className="secondary-button">
+          <button
+            className="secondary-button"
+            onClick={() =>
+              window.open(
+                "https://github.com/Pranay0083/Think-Box-an-E-learning-Platform",
+                "_blank"
+              )
+            }
+          >
             Watch Demo <Play size={20} />
           </button>
         </div>
