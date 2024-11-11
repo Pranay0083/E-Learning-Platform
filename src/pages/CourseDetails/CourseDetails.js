@@ -25,8 +25,8 @@ const CourseDetails = () => {
 
 
   // Check authentication
-  const authToken = localStorage.getItem("authToken");
-  const userId = localStorage.getItem("userID");
+  const authToken = localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
+  const userId = localStorage.getItem("userID") || sessionStorage.getItem("userID");
 
   const fetchCourseDetails = useCallback(async () => {
     setLoading(true);
@@ -156,7 +156,7 @@ const CourseDetails = () => {
   const handleDelete = async () => {
     try {
 
-      const response = await deleteCourse(courseId, localStorage.getItem("authToken"));
+      const response = await deleteCourse(courseId, authToken);
       navigate('/courses'); // Redirect after deletion
     } catch (err) {
       console.log(err);

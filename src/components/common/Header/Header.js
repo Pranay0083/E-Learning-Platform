@@ -5,9 +5,14 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isLogin, setIsLogin] = useState(localStorage.getItem('isLogin')
-        ? localStorage.getItem('isLogin')
-        : localStorage.getItem('isLogin') === 'true');
+    // const [isLogin, setIsLogin] = useState(localStorage.getItem('isLogin')
+    //     ? localStorage.getItem('isLogin')
+    //     : localStorage.getItem('isLogin') === 'true');
+
+    const loginStatus = localStorage.getItem('isLogin') || sessionStorage.getItem('isLogin');
+    const userId = localStorage.getItem('userID') || sessionStorage.getItem('userID');
+    const isLogin = loginStatus ? loginStatus : loginStatus === 'true';
+
     const navigate = useNavigate();
     const location = useLocation();
     const headerRef = useRef(null);
@@ -54,7 +59,7 @@ const Header = () => {
                 <div className="header-actions">
                     {/* <button aria-label="Search"> <Search size={20} /> </button> */}
                     <button aria-label="Account" 
-                    onClick={() => isLogin ? navigate(`/profile/${localStorage.getItem('userID')}`) : navigate('/login')}
+                    onClick={() => isLogin ? navigate(`/profile/${userId}`) : navigate('/login')}
                     >
                         {/* onClick={()=>{navigate('/login')}} */}
                         <User size={20} />

@@ -96,10 +96,11 @@ const UpdateCoursePage = () => {
         }));
     };
 
+    const authToken = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await updateCourse(courseId, course, localStorage.getItem('authToken'));
+            const response = await updateCourse(courseId, course, authToken);
             console.log(response.data)
             navigate(`/courses/${courseId}`);
         } catch (err) {

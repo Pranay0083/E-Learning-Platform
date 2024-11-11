@@ -77,14 +77,14 @@ const LoginPage = () => {
     try {
       const response = isLoginForm ? await login(userData) : await register(userData);
       const { token } = response.data;
-      localStorage.setItem('userID', response.data.userId);
-      localStorage.setItem('isLogin', "true");
 
       if (rememberMe) {
         localStorage.setItem('userID', response.data.userId);
         localStorage.setItem('isLogin', "true");
         localStorage.setItem('authToken', token);
       } else {
+        sessionStorage.setItem('userID', response.data.userId);
+        sessionStorage.setItem('isLogin', "true");
         sessionStorage.setItem('authToken', token);
       }
       setLoading(false);

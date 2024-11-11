@@ -14,7 +14,7 @@ const EnrollmentPage = () => {
     const fetchEnrollments = async () => {
       setLoading(true);
       try {
-        const authToken = localStorage.getItem("authToken");
+        const authToken = localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
         if (authToken) {
           const enrollmentsResponse = await getEnrollments(authToken);
           const enrolledCoursesData = await Promise.all(

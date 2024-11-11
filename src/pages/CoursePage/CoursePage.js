@@ -14,11 +14,12 @@ const CoursesPage = () => {
   const [isUserInstructor, setIsUserInstructor] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const authToken = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
   useEffect(() => {
     const checkUserRole = async () => {
-      if (localStorage.getItem('authToken')) {
+      if (authToken) {
         try {
-          const response = await getCurrentUser(localStorage.getItem('authToken'));
+          const response = await getCurrentUser(authToken);
           if (response.data.role === 'teacher') {
             setIsUserInstructor(true);
           }
@@ -59,7 +60,7 @@ const CoursesPage = () => {
   };
 
   const handleCreateCourse = async (newCourse) => {
-    const response = await createCourse(newCourse, localStorage.getItem('authToken'))
+    const response = await createCourse(newCourse, authToken)
     console.log('New Course:', response.data);
   };
 

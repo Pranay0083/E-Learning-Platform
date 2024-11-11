@@ -15,11 +15,14 @@ const ProfilePage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
+  const authToken = localStorage.getItem("authToken") || sessionStorage.getItem('authToken');
+  const userId = localStorage.getItem("userID") || sessionStorage.getItem("userID");
+
   useEffect(() => {
     const fetchUserData = async () => {
       setLoading(true);
       try {
-        const response = await getCurrentUser(localStorage.getItem("authToken"));
+        const response = await getCurrentUser(authToken);
         setUserData(response.data);
         setLoading(false);
       } catch (err) {
@@ -40,7 +43,6 @@ const ProfilePage = () => {
       throw new Error('User ID is required');
     }
   
-    const authToken = localStorage.getItem('authToken');
     if (!authToken) {
       throw new Error('Authentication token is missing');
     }
@@ -126,7 +128,7 @@ const ProfilePage = () => {
   };
 
   const handleDeleteAccount = async () => {
-    await deleteUser(localStorage.getItem("userID"), localStorage.getItem("authToken"));
+    await deleteUser(userId, authToken);
     localStorage.clear();
     navigate('/');
     window.location.reload();
