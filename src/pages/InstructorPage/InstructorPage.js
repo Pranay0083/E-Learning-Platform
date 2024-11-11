@@ -100,7 +100,7 @@ const InstructorPage = () => {
                 </div>
                 <div className="stat">
                   <Users size={16} />
-                  <span>{instructor.students.toLocaleString()} students</span>
+                  {/* {instructor.students.toLocaleString() ? instructor.students.toLocaleString() : 0} students */}
                 </div>
                 <div className="stat">
                   <Award size={16} />

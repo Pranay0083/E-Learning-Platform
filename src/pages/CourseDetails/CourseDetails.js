@@ -225,10 +225,10 @@ const CourseDetails = () => {
         </div>
         <div className="course-preview">
           <img src={course.image} alt={course.title} />
-          <button className="preview-button">
-            <PlayCircle size={48} />
-            <span>Watch Preview</span>
-          </button>
+          {/* <button className="preview-button"> */}
+            {/* <PlayCircle size={48} />
+            <span>Watch Preview</span> */}
+          {/* </button> */}
         </div>
       </div>
 

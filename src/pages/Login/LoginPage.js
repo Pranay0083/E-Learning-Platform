@@ -70,23 +70,26 @@ const LoginPage = () => {
       ...(isLoginForm
         ? {}
         : {
-            name,
-            role: isInstructor ? "teacher" : "student"
-          })
+          name,
+          role: isInstructor ? "teacher" : "student"
+        })
     };
     try {
       const response = isLoginForm ? await login(userData) : await register(userData);
       const { token } = response.data;
       localStorage.setItem('userID', response.data.userId);
       localStorage.setItem('isLogin', "true");
+
       if (rememberMe) {
+        localStorage.setItem('userID', response.data.userId);
+        localStorage.setItem('isLogin', "true");
         localStorage.setItem('authToken', token);
       } else {
         sessionStorage.setItem('authToken', token);
       }
       setLoading(false);
-      if (isLoginForm){
-        navigate('/')
+      if (isLoginForm) {
+        navigate(-1)
       }
       setIsLoginForm(true)
     } catch (err) {
@@ -105,12 +108,12 @@ const LoginPage = () => {
         <h1 className="form__title">Log in to your Account</h1>
         <p className="form__description">Welcome back! Please, enter your information</p>
 
-        <form onSubmit={(e)=>{handleSubmit(e)}}>
+        <form onSubmit={(e) => { handleSubmit(e) }}>
           <label className="form-control__label">Email</label>
           <input
             type="email"
             className="form-control"
-            onChange={(e) => {handleMail(e.target.value)}}
+            onChange={(e) => { handleMail(e.target.value) }}
             placeholder="Email"
           />
 
@@ -211,7 +214,7 @@ const LoginPage = () => {
               </span>
               Sign up as Instructor
             </label>
-            
+
             <Link to="#">Forgot Password?</Link>
           </div>
           {error && <p>{error.response.data.message}</p>}
