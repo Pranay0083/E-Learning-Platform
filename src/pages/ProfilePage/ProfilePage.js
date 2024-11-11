@@ -38,19 +38,19 @@ const ProfilePage = () => {
     if (!formData || typeof formData !== 'object') {
       throw new Error('Invalid form data provided');
     }
-  
+
     if (!id) {
       throw new Error('User ID is required');
     }
-  
+
     if (!authToken) {
       throw new Error('Authentication token is missing');
     }
-  
+
     try {
       setLoading(true);
       setError(null); // Clear any previous errors
-  
+
       // Function to remove empty values from an object
       const removeEmptyValues = (obj) => {
         const newObj = {};
@@ -59,9 +59,9 @@ const ProfilePage = () => {
           if (Array.isArray(value)) {
             if (value.length > 0) {
               // Filter out empty strings from arrays
-              const filteredArray = value.filter(item => 
-                item !== null && 
-                item !== undefined && 
+              const filteredArray = value.filter(item =>
+                item !== null &&
+                item !== undefined &&
                 String(item).trim() !== ''
               );
               if (filteredArray.length > 0) {
@@ -78,8 +78,8 @@ const ProfilePage = () => {
           }
           // Handle primitive values
           else if (
-            value !== null && 
-            value !== undefined && 
+            value !== null &&
+            value !== undefined &&
             String(value).trim() !== ''
           ) {
             newObj[key] = value;
@@ -87,39 +87,39 @@ const ProfilePage = () => {
         });
         return newObj;
       };
-  
+
       // Process achievements
       const processedFormData = {
         ...formData,
-        achievements: formData.achievements 
+        achievements: formData.achievements
           ? String(formData.achievements)
-              .split(',')
-              .map(achievement => achievement.trim())
-              .filter(achievement => achievement !== '')
+            .split(',')
+            .map(achievement => achievement.trim())
+            .filter(achievement => achievement !== '')
           : []
       };
-  
+
       const cleanedFormData = removeEmptyValues(processedFormData);
-  
+
       const response = await updateUser(id, cleanedFormData, authToken);
-  
+
       if (!response || !response.data) {
         throw new Error('Invalid response from server');
       }
-  
+
       setUserData(response.data);
       setIsEditModalOpen(false);
-  
+
     } catch (error) {
       const errorMessage = error.response?.data?.message || error.message || 'An error occurred while saving';
       setError(errorMessage);
       console.error('Save Error:', error);
-  
+
     } finally {
       setLoading(false);
     }
   };
-  
+
 
   const handleLogout = async () => {
     await logout();
@@ -147,9 +147,9 @@ const ProfilePage = () => {
               src={userData.image || '/api/placeholder/150/150'}
               alt={userData.name || 'Profile'}
             />
-            <button className="camera-btn">
+            {/* <button className="camera-btn">
               <Camera size={20} />
-            </button>
+            </button> */}
           </div>
         </div>
         <div className="profile-info">
@@ -220,36 +220,43 @@ const ProfilePage = () => {
         <div className="tab-content">
           {activeTab === 'profile' && (
             <div className="profile-section">
-              {userData.bio && (
-                <div className="section-card">
-                  <h2>Bio</h2>
+              <div className="section-card">
+                <h2>Bio</h2>
+                {userData.bio ? (
                   <p>{userData.bio}</p>
-                </div>
-              )}
+                ) : (<p>Bio not written</p>)
+                }
+              </div>
 
-              {userData.about && (
-                <div className="section-card">
-                  <h2>About</h2>
+              <div className="section-card">
+                <h2>About</h2>
+                {userData.about ? (
                   <p>{userData.about}</p>
-                </div>
-              )}
+                ) : (
+                  <p>About not written</p>
+                )}
+              </div>
 
-              {userData.achievements && userData.achievements.length > 0 && (
-                <div className="section-card">
-                  <h2>Achievements</h2>
+
+              <div className="section-card">
+                <h2>Achievements</h2>
+                {userData.achievements && userData.achievements.length > 0 ? (
                   <ul className="list-disc pl-4">
                     {userData.achievements.map((achievement, index) => (
                       <li key={index}>{achievement}</li>
                     ))}
                   </ul>
-                </div>
-              )}
+                ) : (
+                  <p>No achievements listed</p>
+                )}
+              </div>
 
-              {userData.socialLinks && (
-                <div className="section-card">
-                  <h2>Social Links</h2>
+
+              <div className="section-card">
+                <h2>Social Links</h2>
+                {userData.socialLinks ? (
                   <div className="social-links">
-                    {userData.socialLinks.linkedin && (
+                    {userData.socialLinks.linkedin ? (
                       <a
                         href={userData.socialLinks.linkedin}
                         className="social-link"
@@ -258,8 +265,8 @@ const ProfilePage = () => {
                       >
                         LinkedIn
                       </a>
-                    )}
-                    {userData.socialLinks.twitter && (
+                    ) : null}
+                    {userData.socialLinks.twitter ? (
                       <a
                         href={userData.socialLinks.twitter}
                         className="social-link"
@@ -268,10 +275,12 @@ const ProfilePage = () => {
                       >
                         Twitter
                       </a>
-                    )}
+                    ) : null}
                   </div>
-                </div>
-              )}
+                ) : (
+                  <p>No social links provided</p>
+                )}
+              </div>
             </div>
           )}
 
