@@ -4,7 +4,6 @@ import { Eye, EyeClosed, Library } from 'lucide-react';
 import { login, register } from '../../services/api';
 
 const LoginPage = () => {
-  const [isSad, setIsSad] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoginForm, setIsLoginForm] = useState(true);
   const [isInstructor, setIsInstructor] = useState(false);
@@ -239,7 +238,7 @@ const LoginPage = () => {
     <main>
       {isLoginForm ? LoginForm() : SignupForm()}
 
-      <section className={`form__animation ${isSad ? 'sad' : ''}`}>
+      <section className={`form__animation`}>
         <div id="ball">
           <div className="ball">
             <div id="face">

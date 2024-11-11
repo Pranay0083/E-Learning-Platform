@@ -4,6 +4,7 @@ import CourseCard from '../../components/common/CourseCard/CourseCard';
 import CourseCreationModal from './CourseCreationModal/CourseCreationModal';
 import './CoursePage.css';
 import { createCourse, getCourses, getCurrentUser } from '../../services/api';
+import Loader from '../../components/common/Loader/Loader';
 
 const CoursesPage = () => {
   const [courses, setCourses] = useState([]);
@@ -29,7 +30,7 @@ const CoursesPage = () => {
       }
     };
     checkUserRole();
-  }, []);
+  }, [authToken]);
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -63,10 +64,6 @@ const CoursesPage = () => {
     const response = await createCourse(newCourse, authToken)
     console.log('New Course:', response.data);
   };
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
 
   if (error) {
     return <div>Error loading courses: {error.message}</div>;
@@ -120,11 +117,17 @@ const CoursesPage = () => {
         </div>
       </div>
 
-      <div className="courses-grid">
-        {filteredCourses.map((course) => (
-          <CourseCard key={course._id} course={course} />
-        ))}
-      </div>
+      {loading ? (
+        <div className="courses-grid">
+        <Loader />
+        </div>
+      ) : (
+        <div className="courses-grid">
+          {filteredCourses.map((course) => (
+            <CourseCard key={course._id} course={course} />
+          ))}
+        </div>
+      )}
 
       {isModalOpen && (
         <CourseCreationModal

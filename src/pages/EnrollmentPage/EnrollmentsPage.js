@@ -3,6 +3,7 @@ import { Clock, BookOpen, BarChart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import './EnrollmentPage.css';
 import { getAllCourses, getEnrollments } from '../../services/api';
+import Loader from '../../components/common/Loader/Loader';
 
 const EnrollmentPage = () => {
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ const EnrollmentPage = () => {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loader/>;
   }
 
   if (error) {

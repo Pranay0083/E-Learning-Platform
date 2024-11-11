@@ -3,6 +3,7 @@ import { Clock, Users, Star, PlayCircle } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './CourseDetails.css';
 import { deleteCourse, deleteEnrollments, enrollInCourse, getAllCourses, getEnrollments } from '../../services/api';
+import Loader from '../../components/common/Loader/Loader';
 
 const CourseDetails = () => {
   const { courseId } = useParams();
@@ -132,7 +133,7 @@ const CourseDetails = () => {
   }
 
   if (loading && !course) {
-    return <div className="course-detail-page">Loading...</div>;
+    return <div className="course-detail-page"><Loader /></div>;
   }
 
   if (error) {
@@ -155,8 +156,7 @@ const CourseDetails = () => {
 
   const handleDelete = async () => {
     try {
-
-      const response = await deleteCourse(courseId, authToken);
+      await deleteCourse(courseId, authToken);
       navigate('/courses'); // Redirect after deletion
     } catch (err) {
       console.log(err);

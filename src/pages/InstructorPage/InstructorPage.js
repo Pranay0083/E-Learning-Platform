@@ -4,6 +4,7 @@ import {useNavigate} from 'react-router-dom'
 import { Search, Star, Award, Users } from 'lucide-react';
 import './InstructorPage.css';
 import { getAllInstructors } from '../../services/api';
+import Loader from '../../components/common/Loader/Loader';
 
 const InstructorPage = () => {
   const navigate = useNavigate();
@@ -32,6 +33,8 @@ const InstructorPage = () => {
     instructor.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
     (selectedExpertise === 'all' || instructor.expertise === selectedExpertise)
   );
+  
+  if (loading) { return <Loader />; }
 
   return (
     <div className="instructor-page">

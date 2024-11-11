@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getAllCourses, updateCourse } from '../../services/api';
 import './UpdateCoursePage.css';
+import Loader from '../../components/common/Loader/Loader';
 
 const UpdateCoursePage = () => {
     const { courseId } = useParams();
@@ -108,7 +109,7 @@ const UpdateCoursePage = () => {
         }
     };
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <Loader />;
     if (error) return <div>Error loading course: {error.message}</div>;
     if (!course) return <div>Course not found</div>;
 

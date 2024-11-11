@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Camera, Edit2, Mail, LogOut, Trash2, User, Book, Settings } from 'lucide-react';
+import { Edit2, Mail, LogOut, Trash2, User, Book } from 'lucide-react';
 import { deleteUser, getCurrentUser, logout, updateUser } from '../../services/api';
 import EditUserModal from './EditModal/Modal';
 import './ProfilePage.css'
+import Loader from '../../components/common/Loader/Loader';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
@@ -32,7 +33,7 @@ const ProfilePage = () => {
       }
     };
     fetchUserData();
-  }, [id]);
+  }, [authToken]);
 
   const handleSave = async (formData) => {
     if (!formData || typeof formData !== 'object') {
@@ -135,8 +136,12 @@ const ProfilePage = () => {
     window.location.reload();
   };
 
+  if (error) {
+    console.log(error)
+  }
+
   if (loading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    return <Loader/>;
   }
 
   return (
